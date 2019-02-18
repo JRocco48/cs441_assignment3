@@ -8,16 +8,52 @@
 
 #import "ViewController.h"
 
-@interface ViewController ()
+@interface ViewController () {
+    UIImageView * bgView1;
+    UIImageView * bgView2;
+    float duration;
+}
 
 @end
 
 @implementation ViewController
 
+// Implementation for scrolling background found at https://www.reddit.com/r/ObjectiveC/comments/1zqhhn/help_with_an_infinite_vertically_scrolling/
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+    UIImage * background = [UIImage imageNamed:@"background.jpg"];
+    bgView1 = [[UIImageView alloc] initWithFrame:self.view.frame];
+    bgView2 = [[UIImageView alloc] initWithFrame:CGRectOffset(self.view.frame, 0, -self.view.frame.size.height)];
+    [bgView1 setImage:background];
+    [bgView2 setImage:background];
+    [self.view addSubview:bgView1];
+    [self.view addSubview:bgView2];
+    [self.view bringSubviewToFront:bgView1];
+    duration = 5;
+    [self animate];
 }
+
+- (void)animate {
+    [UIView animateWithDuration:duration delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+        bgView1.frame = CGRectOffset(bgView1.frame, 0, bgView1.frame.size.height);
+        bgView2.frame = CGRectOffset(bgView2.frame, 0, bgView2.frame.size.height);
+    } completion:^(BOOL done) {
+        if (done) {
+            bgView1.frame = CGRectOffset(bgView1.frame, 0, -2*bgView1.frame.size.height);
+            [UIView animateWithDuration:duration delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+                bgView2.frame = CGRectOffset(bgView2.frame, 0, bgView2.frame.size.height);
+                bgView1.frame = CGRectOffset(bgView1.frame, 0, bgView1.frame.size.height);
+            } completion:^(BOOL done) {
+                if (done) {
+                    bgView2.frame = CGRectOffset(bgView2.frame, 0, -2*bgView2.frame.size.height);
+                    [self animate];
+                }
+            }];
+        }
+    }];
+}
+
 
 
 - (void)didReceiveMemoryWarning {
