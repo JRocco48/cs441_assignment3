@@ -11,6 +11,7 @@
 @interface ViewController () {
     UIImageView * bgView1;
     UIImageView * bgView2;
+    UIImageView * player;
     float duration;
 }
 
@@ -18,10 +19,18 @@
 
 @implementation ViewController
 
-// Implementation for scrolling background found at https://www.reddit.com/r/ObjectiveC/comments/1zqhhn/help_with_an_infinite_vertically_scrolling/
-
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self setupBackground];
+    player = [[UIImageView alloc] initWithFrame:CGRectMake(self.view.frame.size.width/2 - 75, self.view.frame.size.height - 150, 150, 150)];
+    [player setImage:[UIImage imageNamed:@"player.png"]];
+
+    [self.view addSubview:player];
+}
+
+// Implementation for scrolling background found at https://www.reddit.com/r/ObjectiveC/comments/1zqhhn/help_with_an_infinite_vertically_scrolling/
+
+- (void)setupBackground {
     UIImage * background = [UIImage imageNamed:@"background.jpg"];
     bgView1 = [[UIImageView alloc] initWithFrame:self.view.frame];
     bgView2 = [[UIImageView alloc] initWithFrame:CGRectOffset(self.view.frame, 0, -self.view.frame.size.height)];
@@ -30,7 +39,7 @@
     [self.view addSubview:bgView1];
     [self.view addSubview:bgView2];
     [self.view bringSubviewToFront:bgView1];
-    duration = 5;
+    duration = 6;
     [self animate];
 }
 
@@ -59,6 +68,10 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (BOOL)shouldAutorotate {
+    return NO;
 }
 
 

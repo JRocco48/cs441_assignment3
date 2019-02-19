@@ -309,6 +309,7 @@
 				2910DEEE221B39E3006D239F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
