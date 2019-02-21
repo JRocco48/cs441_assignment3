@@ -30,7 +30,10 @@
 
 - (void)setupEnemy {
     enemy = [[UIImageView alloc] initWithFrame:CGRectMake(self.view.frame.size.width/2, self.view.frame.size.height/2, 100, 100)];
-    enemy.animationImages = [NSArray arrayWithObjects:[UIImage imageNamed:@"enemy1"], nil];
+    enemy.animationImages = [NSArray arrayWithObjects:
+                             [UIImage imageNamed:@"enemy1"],
+                             [UIImage imageNamed:@"enemy2"],
+                             [UIImage imageNamed:@"enemy3"], nil];
     enemy.animationDuration = 0.2f;
     [enemy setAnimationRepeatCount:0];
     [self.view addSubview:enemy];
