@@ -12,6 +12,7 @@
     UIImageView * bgView1;
     UIImageView * bgView2;
     UIImageView * player;
+    UIImageView * enemy;
     float duration;
 }
 
@@ -23,7 +24,17 @@
     [super viewDidLoad];
     [self setupBackground];
     [self setupPlayer];
+    [self setupEnemy];
     
+}
+
+- (void)setupEnemy {
+    enemy = [[UIImageView alloc] initWithFrame:CGRectMake(self.view.frame.size.width/2, self.view.frame.size.height/2, 100, 100)];
+    enemy.animationImages = [NSArray arrayWithObjects:[UIImage imageNamed:@"enemy1"], nil];
+    enemy.animationDuration = 0.2f;
+    [enemy setAnimationRepeatCount:0];
+    [self.view addSubview:enemy];
+    [enemy startAnimating];
 }
 
 - (void)setupPlayer {
