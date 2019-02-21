@@ -22,10 +22,21 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupBackground];
-    player = [[UIImageView alloc] initWithFrame:CGRectMake(self.view.frame.size.width/2 - 75, self.view.frame.size.height - 150, 150, 150)];
-    [player setImage:[UIImage imageNamed:@"player.png"]];
+    [self setupPlayer];
+    
+}
 
+- (void)setupPlayer {
+    player = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width/2)-75, self.view.frame.size.height-120, 120, 100)];
+    player.animationImages = [NSArray arrayWithObjects:
+                              [UIImage imageNamed:@"defaultplayer1"],
+                              [UIImage imageNamed:@"defaultplayer2"],
+                              [UIImage imageNamed:@"defaultplayer3"],
+                              [UIImage imageNamed:@"defaultplayer4"], nil];
+    player.animationDuration = 0.2f;
+    [player setAnimationRepeatCount:0];
     [self.view addSubview:player];
+    [player startAnimating];
 }
 
 // Implementation for scrolling background found at https://www.reddit.com/r/ObjectiveC/comments/1zqhhn/help_with_an_infinite_vertically_scrolling/
@@ -45,17 +56,17 @@
 
 - (void)animate {
     [UIView animateWithDuration:duration delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-        bgView1.frame = CGRectOffset(bgView1.frame, 0, bgView1.frame.size.height);
-        bgView2.frame = CGRectOffset(bgView2.frame, 0, bgView2.frame.size.height);
+        self->bgView1.frame = CGRectOffset(self->bgView1.frame, 0, self->bgView1.frame.size.height);
+        self->bgView2.frame = CGRectOffset(self->bgView2.frame, 0, self->bgView2.frame.size.height);
     } completion:^(BOOL done) {
         if (done) {
-            bgView1.frame = CGRectOffset(bgView1.frame, 0, -2*bgView1.frame.size.height);
-            [UIView animateWithDuration:duration delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-                bgView2.frame = CGRectOffset(bgView2.frame, 0, bgView2.frame.size.height);
-                bgView1.frame = CGRectOffset(bgView1.frame, 0, bgView1.frame.size.height);
+            self->bgView1.frame = CGRectOffset(self->bgView1.frame, 0, -2*self->bgView1.frame.size.height);
+            [UIView animateWithDuration:self->duration delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+                self->bgView2.frame = CGRectOffset(self->bgView2.frame, 0, self->bgView2.frame.size.height);
+                self->bgView1.frame = CGRectOffset(self->bgView1.frame, 0, self->bgView1.frame.size.height);
             } completion:^(BOOL done) {
                 if (done) {
-                    bgView2.frame = CGRectOffset(bgView2.frame, 0, -2*bgView2.frame.size.height);
+                    self->bgView2.frame = CGRectOffset(self->bgView2.frame, 0, -2*self->bgView2.frame.size.height);
                     [self animate];
                 }
             }];
@@ -63,7 +74,19 @@
     }];
 }
 
-
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:touch.view];
+    if(touchLocation.x - 60 > player.frame.origin.x) {
+        [UIView animateWithDuration:(0.5f) animations:^{
+            self->player.center = CGPointMake(self->player.center.x + 25, self->player.center.y);
+        }];
+    } else {
+        [UIView animateWithDuration:(0.5f) animations:^{
+            self->player.center = CGPointMake(self->player.center.x - 25, self->player.center.y);
+        }];
+    }
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
