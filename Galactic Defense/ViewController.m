@@ -13,7 +13,9 @@
     UIImageView * bgView2;
     UIImageView * player;
     UIImageView * enemy;
+    NSMutableArray * lasers;
     float duration;
+    int laserAlternator;
 }
 
 @end
@@ -34,23 +36,42 @@
                              [UIImage imageNamed:@"enemy1"],
                              [UIImage imageNamed:@"enemy2"],
                              [UIImage imageNamed:@"enemy3"], nil];
-    enemy.animationDuration = 0.2f;
+    enemy.animationDuration = 0.3f;
     [enemy setAnimationRepeatCount:0];
     [self.view addSubview:enemy];
     [enemy startAnimating];
 }
 
 - (void)setupPlayer {
-    player = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width/2)-75, self.view.frame.size.height-120, 120, 100)];
+    player = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width/2)-75, self.view.frame.size.height-120, 80, 80)];
     player.animationImages = [NSArray arrayWithObjects:
-                              [UIImage imageNamed:@"defaultplayer1"],
-                              [UIImage imageNamed:@"defaultplayer2"],
-                              [UIImage imageNamed:@"defaultplayer3"],
-                              [UIImage imageNamed:@"defaultplayer4"], nil];
-    player.animationDuration = 0.2f;
+                              [UIImage imageNamed:@"player0"],
+                              [UIImage imageNamed:@"player1"],
+                              [UIImage imageNamed:@"player2"], nil];
+    player.animationDuration = 0.3f;
     [player setAnimationRepeatCount:0];
     [self.view addSubview:player];
     [player startAnimating];
+    
+   // NSMutableArray * lasers = [[NSMutableArray alloc] init];
+   [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(spawnLaser:) userInfo:nil repeats:YES];
+
+}
+
+-(void)spawnLaser: (NSTimer *) timer {
+    UIImageView * laser = [[UIImageView alloc] initWithFrame:CGRectMake(player.center.x-40, player.center.y-40, 80, 80)];
+    laser.image = [UIImage imageNamed:@"laser"];
+    
+    [UIView animateWithDuration:2
+                          delay:0.0
+                        options: UIViewAnimationOptionCurveLinear
+                     animations:^{
+                         [laser setFrame:CGRectMake(laser.frame.size.width, laser.center.x, laser.frame.size.height, self.view.frame.size.height)];
+                     }
+                     completion:^(BOOL finished){
+                         NSLog(@"DELETE!");
+                     }];
+    [self.view addSubview:laser];
 }
 
 // Implementation for scrolling background found at https://www.reddit.com/r/ObjectiveC/comments/1zqhhn/help_with_an_infinite_vertically_scrolling/
@@ -64,7 +85,7 @@
     [self.view addSubview:bgView1];
     [self.view addSubview:bgView2];
     [self.view bringSubviewToFront:bgView1];
-    duration = 6;
+    duration = 8;
     [self animate];
 }
 
@@ -91,15 +112,15 @@
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:touch.view];
-    if(touchLocation.x - 60 > player.frame.origin.x) {
-        [UIView animateWithDuration:(0.5f) animations:^{
-            self->player.center = CGPointMake(self->player.center.x + 25, self->player.center.y);
-        }];
-    } else {
-        [UIView animateWithDuration:(0.5f) animations:^{
-            self->player.center = CGPointMake(self->player.center.x - 25, self->player.center.y);
-        }];
-    }
+    [UIView animateWithDuration:(1.0f) delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self->player.center = touchLocation;
+    }completion:nil];
+}
+
+- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:touch.view];
+    self->player.center = touchLocation;
 }
 
 - (void)didReceiveMemoryWarning {
