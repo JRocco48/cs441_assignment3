@@ -12,8 +12,13 @@
     UIImageView * bgView1;
     UIImageView * bgView2;
     UIImageView * player;
-    UIImageView * enemy;
+    
+    CGPoint touchOrigin;
+    CGPoint playerOrigin;
+    
     NSMutableArray * lasers;
+    NSMutableArray * enemies;
+    
     float duration;
     int laserAlternator;
 }
@@ -23,15 +28,17 @@
 @implementation ViewController
 
 - (void)viewDidLoad {
+    lasers = [NSMutableArray array];
+    enemies = [NSMutableArray array];
     [super viewDidLoad];
     [self setupBackground];
     [self setupPlayer];
-    [self setupEnemy];
-    
+    [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(spawnEnemy:) userInfo:nil repeats:YES];
+    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(checkCollisions:) userInfo:nil repeats:YES];
 }
 
-- (void)setupEnemy {
-    enemy = [[UIImageView alloc] initWithFrame:CGRectMake(self.view.frame.size.width/2, self.view.frame.size.height/2, 100, 100)];
+- (void)spawnEnemy: (NSTimer *) timer {
+    UIImageView * enemy = [[UIImageView alloc] initWithFrame:CGRectMake(arc4random() % (int)(self.view.frame.size.width - 100), -100, 100, 100)];
     enemy.animationImages = [NSArray arrayWithObjects:
                              [UIImage imageNamed:@"enemy1"],
                              [UIImage imageNamed:@"enemy2"],
@@ -40,6 +47,17 @@
     [enemy setAnimationRepeatCount:0];
     [self.view addSubview:enemy];
     [enemy startAnimating];
+    
+    [enemies addObject:enemy];
+    [UIView animateWithDuration:7
+                          delay:0.0
+                        options: UIViewAnimationOptionCurveLinear
+                     animations:^{
+                         [enemy setFrame:CGRectMake(enemy.frame.origin.x, self.view.frame.size.height + 100, 100, 100)];
+                     }
+                     completion:^(BOOL finished){
+                         enemy.image = nil;
+                     }];
 }
 
 - (void)setupPlayer {
@@ -54,24 +72,44 @@
     [player startAnimating];
     
    // NSMutableArray * lasers = [[NSMutableArray alloc] init];
-   [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(spawnLaser:) userInfo:nil repeats:YES];
+   [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(shootLaser:) userInfo:nil repeats:YES];
 
 }
 
--(void)spawnLaser: (NSTimer *) timer {
-    UIImageView * laser = [[UIImageView alloc] initWithFrame:CGRectMake(player.center.x-40, player.center.y-40, 80, 80)];
+-(void)shootLaser: (NSTimer *) timer {
+    int laserStart;
+    if(laserAlternator == 0) {
+        laserAlternator = 1;
+        laserStart = player.center.x-11;
+    } else {
+        laserAlternator = 0;
+        laserStart = player.center.x - 66;
+    }
+    UIImageView * laser = [[UIImageView alloc] initWithFrame:CGRectMake(laserStart, player.center.y-32, 80, 80)];
     laser.image = [UIImage imageNamed:@"laser"];
-    
-    [UIView animateWithDuration:2
-                          delay:0.0
+    [UIView animateWithDuration:player.frame.origin.y/400
+                        delay:0.0
                         options: UIViewAnimationOptionCurveLinear
                      animations:^{
-                         [laser setFrame:CGRectMake(laser.frame.size.width, laser.center.x, laser.frame.size.height, self.view.frame.size.height)];
+                         [laser setFrame:CGRectMake(laserStart, -100, 80, 80)];
                      }
                      completion:^(BOOL finished){
-                         NSLog(@"DELETE!");
+                         laser.image = nil;
                      }];
     [self.view addSubview:laser];
+    [self.view bringSubviewToFront:player];
+    
+    [lasers addObject:laser];
+}
+
+- (void)checkCollisions: (NSTimer *) timer {
+    for(UIImageView * enemy in enemies) {
+        for(UIImageView * laser in lasers) {
+            if(CGRectContainsPoint(enemy.frame, laser.frame.origin)) {
+                enemy.image = nil;
+            }
+        }
+    }
 }
 
 // Implementation for scrolling background found at https://www.reddit.com/r/ObjectiveC/comments/1zqhhn/help_with_an_infinite_vertically_scrolling/
@@ -111,16 +149,24 @@
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [[event allTouches] anyObject];
-    CGPoint touchLocation = [touch locationInView:touch.view];
-    [UIView animateWithDuration:(1.0f) delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self->player.center = touchLocation;
-    }completion:nil];
+    touchOrigin = [touch locationInView:touch.view];
+    playerOrigin = self->player.center;
 }
+
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:touch.view];
-    self->player.center = touchLocation;
+    CGFloat changedX = touchLocation.x - touchOrigin.x;
+    CGFloat changedY = touchLocation.y - touchOrigin.y;
+    CGFloat newX = playerOrigin.x + changedX;
+    CGFloat newY = playerOrigin.y + changedY;
+    if(playerOrigin.x + changedX > self.view.frame.size.width) newX = self.view.frame.size.width;
+    if(playerOrigin.x + changedX < 0) newX = 0;
+    if(playerOrigin.y + changedY > self.view.frame.size.height) newY = self.view.frame.size.height;
+    if(playerOrigin.y + changedY < 0) newY = 0;
+    self->player.center = CGPointMake(newX, newY);
+    
 }
 
 - (void)didReceiveMemoryWarning {
