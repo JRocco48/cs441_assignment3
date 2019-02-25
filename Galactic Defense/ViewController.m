@@ -33,8 +33,8 @@
     [super viewDidLoad];
     [self setupBackground];
     [self setupPlayer];
-    [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(spawnEnemy:) userInfo:nil repeats:YES];
-    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(checkCollisions:) userInfo:nil repeats:YES];
+    [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(spawnEnemy:) userInfo:nil repeats:YES];
+    [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(checkCollisions:) userInfo:nil repeats:YES];
 }
 
 - (void)spawnEnemy: (NSTimer *) timer {
@@ -71,8 +71,7 @@
     [self.view addSubview:player];
     [player startAnimating];
     
-   // NSMutableArray * lasers = [[NSMutableArray alloc] init];
-   [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(shootLaser:) userInfo:nil repeats:YES];
+   [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(shootLaser:) userInfo:nil repeats:YES];
 
 }
 
@@ -105,9 +104,9 @@
 - (void)checkCollisions: (NSTimer *) timer {
     for(UIImageView * enemy in enemies) {
         for(UIImageView * laser in lasers) {
-            if(CGRectContainsPoint(enemy.frame, laser.frame.origin)) {
-                enemy.image = nil;
-            }
+            if(CGRectContainsPoint(enemy.layer.presentationLayer.frame, laser.layer.presentationLayer.frame.origin)) {
+                [enemy.layer removeAllAnimations];
+                [laser.layer removeAllAnimations];            }
         }
     }
 }
