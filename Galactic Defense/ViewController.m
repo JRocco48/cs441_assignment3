@@ -33,12 +33,12 @@
     [super viewDidLoad];
     [self setupBackground];
     [self setupPlayer];
-    [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(spawnEnemy:) userInfo:nil repeats:YES];
-    [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(checkCollisions:) userInfo:nil repeats:YES];
+    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(spawnEnemy:) userInfo:nil repeats:YES];
+    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(checkCollisions:) userInfo:nil repeats:YES];
 }
 
 - (void)spawnEnemy: (NSTimer *) timer {
-    UIImageView * enemy = [[UIImageView alloc] initWithFrame:CGRectMake(arc4random() % (int)(self.view.frame.size.width - 100), -100, 100, 100)];
+    UIImageView * enemy = [[UIImageView alloc] initWithFrame:CGRectMake(arc4random() % (int)(self.view.frame.size.width - 50), -100, 80, 80)];
     enemy.animationImages = [NSArray arrayWithObjects:
                              [UIImage imageNamed:@"enemy1"],
                              [UIImage imageNamed:@"enemy2"],
@@ -71,7 +71,7 @@
     [self.view addSubview:player];
     [player startAnimating];
     
-   [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(shootLaser:) userInfo:nil repeats:YES];
+   [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(shootLaser:) userInfo:nil repeats:YES];
 
 }
 
@@ -104,7 +104,12 @@
 - (void)checkCollisions: (NSTimer *) timer {
     for(UIImageView * enemy in enemies) {
         for(UIImageView * laser in lasers) {
-            if(CGRectContainsPoint(enemy.layer.presentationLayer.frame, laser.layer.presentationLayer.frame.origin)) {
+            if(CGRectContainsPoint(CGRectMake(enemy.layer.presentationLayer.frame.origin.x + 40,
+                                              enemy.layer.presentationLayer.frame.origin.y + 70,
+                                              12,
+                                              12),
+                                   CGPointMake(laser.layer.presentationLayer.frame.origin.x + 40,
+                                               laser.layer.presentationLayer.frame.origin.y + 40))) {
                 [enemy.layer removeAllAnimations];
                 [laser.layer removeAllAnimations];            }
         }
