@@ -35,7 +35,7 @@
     [super viewDidLoad];
     [self setupBackground];
     [self setupPlayer];
-    [NSTimer scheduledTimerWithTimeInterval:0.8 target:self selector:@selector(spawnEnemy:) userInfo:nil repeats:YES];
+    [NSTimer scheduledTimerWithTimeInterval:0.6 target:self selector:@selector(spawnEnemy:) userInfo:nil repeats:YES];
     [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(checkCollisions:) userInfo:nil repeats:YES];
 }
 
@@ -73,7 +73,7 @@
     [self.view addSubview:player];
     [player startAnimating];
     
-   [NSTimer scheduledTimerWithTimeInterval:0.4 target:self selector:@selector(shootLaser:) userInfo:nil repeats:YES];
+   [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(shootLaser:) userInfo:nil repeats:YES];
 
 }
 
@@ -128,7 +128,17 @@
                                        [explosion startAnimating];
             }
         }
+        if(CGRectContainsRect(player.layer.presentationLayer.frame, CGRectMake(enemy.layer.presentationLayer.frame.origin.x + 10,
+                                                       enemy.layer.presentationLayer.frame.origin.y + 10,
+                                                       50,
+                                                       50))) {
+            [self playerHit];
+        }
     }
+}
+
+- (void)playerHit {
+   exit(0);
 }
 
 // Implementation for scrolling background found at https://www.reddit.com/r/ObjectiveC/comments/1zqhhn/help_with_an_infinite_vertically_scrolling/
