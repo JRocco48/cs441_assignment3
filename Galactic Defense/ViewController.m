@@ -21,6 +21,7 @@
     
     float duration;
     int laserAlternator;
+    __weak IBOutlet UILabel *scoreLabel;
 }
 
 @end
@@ -28,13 +29,14 @@
 @implementation ViewController
 
 - (void)viewDidLoad {
+    scoreLabel.text = @"0";
     lasers = [NSMutableArray array];
     enemies = [NSMutableArray array];
     [super viewDidLoad];
     [self setupBackground];
     [self setupPlayer];
-    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(spawnEnemy:) userInfo:nil repeats:YES];
-    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(checkCollisions:) userInfo:nil repeats:YES];
+    [NSTimer scheduledTimerWithTimeInterval:0.8 target:self selector:@selector(spawnEnemy:) userInfo:nil repeats:YES];
+    [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(checkCollisions:) userInfo:nil repeats:YES];
 }
 
 - (void)spawnEnemy: (NSTimer *) timer {
@@ -49,7 +51,7 @@
     [enemy startAnimating];
     
     [enemies addObject:enemy];
-    [UIView animateWithDuration:7
+    [UIView animateWithDuration:(arc4random() % 15) + 6
                           delay:0.0
                         options: UIViewAnimationOptionCurveLinear
                      animations:^{
@@ -71,7 +73,7 @@
     [self.view addSubview:player];
     [player startAnimating];
     
-   [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(shootLaser:) userInfo:nil repeats:YES];
+   [NSTimer scheduledTimerWithTimeInterval:0.4 target:self selector:@selector(shootLaser:) userInfo:nil repeats:YES];
 
 }
 
@@ -104,14 +106,27 @@
 - (void)checkCollisions: (NSTimer *) timer {
     for(UIImageView * enemy in enemies) {
         for(UIImageView * laser in lasers) {
-            if(CGRectContainsPoint(CGRectMake(enemy.layer.presentationLayer.frame.origin.x + 40,
-                                              enemy.layer.presentationLayer.frame.origin.y + 70,
-                                              12,
-                                              12),
+            if(CGRectContainsPoint(CGRectMake(enemy.layer.presentationLayer.frame.origin.x + 35,
+                                              enemy.layer.presentationLayer.frame.origin.y + 65,
+                                              25,
+                                              25),
                                    CGPointMake(laser.layer.presentationLayer.frame.origin.x + 40,
                                                laser.layer.presentationLayer.frame.origin.y + 40))) {
-                [enemy.layer removeAllAnimations];
-                [laser.layer removeAllAnimations];            }
+                                       [enemy.layer removeAllAnimations];
+                                       [laser.layer removeAllAnimations];
+                                       int current = scoreLabel.text.intValue;
+                                       current++;
+                                       scoreLabel.text = [NSString stringWithFormat:@"%d", (int)current];
+                                       UIImageView * explosion = [[UIImageView alloc] initWithFrame:CGRectMake(enemy.layer.presentationLayer.frame.origin.x-50, enemy.layer.presentationLayer.frame.origin.y, 200, 200)];
+                                       explosion.animationImages = [NSArray arrayWithObjects:
+                                                                 [UIImage imageNamed:@"explosion0"],
+                                                                 [UIImage imageNamed:@"explosion1"],
+                                                                 [UIImage imageNamed:@"explosion2"], nil];
+                                       explosion.animationDuration = 0.3f;
+                                       [explosion setAnimationRepeatCount:1];
+                                       [self.view addSubview:explosion];
+                                       [explosion startAnimating];
+            }
         }
     }
 }
@@ -126,7 +141,8 @@
     [bgView2 setImage:background];
     [self.view addSubview:bgView1];
     [self.view addSubview:bgView2];
-    [self.view bringSubviewToFront:bgView1];
+    [self.view sendSubviewToBack: bgView1];
+    [self.view sendSubviewToBack: bgView2];
     duration = 8;
     [self animate];
 }
