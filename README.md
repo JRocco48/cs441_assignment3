@@ -7,3 +7,5 @@ But be careful, their ships are strong and can only be destroyed if hit on the w
 This game is a very generic space shooter with a moving background, but was very fun to create. 
 The artwork was done by my friend Vinny Desimone.
 Enjoy 8^)
+
+![](gif.gif)
