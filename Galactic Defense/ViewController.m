@@ -63,6 +63,7 @@
 }
 
 - (void)setupPlayer {
+    
     player = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width/2)-75, self.view.frame.size.height-120, 80, 80)];
     player.animationImages = [NSArray arrayWithObjects:
                               [UIImage imageNamed:@"player0"],
@@ -73,8 +74,8 @@
     [self.view addSubview:player];
     [player startAnimating];
     
-   [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(shootLaser:) userInfo:nil repeats:YES];
-
+    [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(shootLaser:) userInfo:nil repeats:YES];
+    
 }
 
 -(void)shootLaser: (NSTimer *) timer {
@@ -89,7 +90,7 @@
     UIImageView * laser = [[UIImageView alloc] initWithFrame:CGRectMake(laserStart, player.center.y-32, 80, 80)];
     laser.image = [UIImage imageNamed:@"laser"];
     [UIView animateWithDuration:player.frame.origin.y/400
-                        delay:0.0
+                          delay:0.0
                         options: UIViewAnimationOptionCurveLinear
                      animations:^{
                          [laser setFrame:CGRectMake(laserStart, -100, 80, 80)];
@@ -119,26 +120,26 @@
                                        scoreLabel.text = [NSString stringWithFormat:@"%d", (int)current];
                                        UIImageView * explosion = [[UIImageView alloc] initWithFrame:CGRectMake(enemy.layer.presentationLayer.frame.origin.x-50, enemy.layer.presentationLayer.frame.origin.y, 200, 200)];
                                        explosion.animationImages = [NSArray arrayWithObjects:
-                                                                 [UIImage imageNamed:@"explosion0"],
-                                                                 [UIImage imageNamed:@"explosion1"],
-                                                                 [UIImage imageNamed:@"explosion2"], nil];
+                                                                    [UIImage imageNamed:@"explosion0"],
+                                                                    [UIImage imageNamed:@"explosion1"],
+                                                                    [UIImage imageNamed:@"explosion2"], nil];
                                        explosion.animationDuration = 0.3f;
                                        [explosion setAnimationRepeatCount:1];
                                        [self.view addSubview:explosion];
                                        [explosion startAnimating];
-            }
+                                   }
         }
         if(CGRectContainsRect(player.layer.presentationLayer.frame, CGRectMake(enemy.layer.presentationLayer.frame.origin.x + 10,
-                                                       enemy.layer.presentationLayer.frame.origin.y + 10,
-                                                       50,
-                                                       50))) {
+                                                                               enemy.layer.presentationLayer.frame.origin.y + 10,
+                                                                               50,
+                                                                               50))) {
             [self playerHit];
         }
     }
 }
 
 - (void)playerHit {
-   exit(0);
+    exit(0);
 }
 
 // Implementation for scrolling background found at https://www.reddit.com/r/ObjectiveC/comments/1zqhhn/help_with_an_infinite_vertically_scrolling/
