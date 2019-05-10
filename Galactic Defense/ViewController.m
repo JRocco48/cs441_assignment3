@@ -35,12 +35,39 @@
     [super viewDidLoad];
     [self setupBackground];
     [self setupPlayer];
-    [NSTimer scheduledTimerWithTimeInterval:0.6 target:self selector:@selector(spawnEnemy:) userInfo:nil repeats:YES];
+    
+    [self levelLoop];
+    
+}
+
+- (void)levelLoop {
+    [self playLevel];
     [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(checkCollisions:) userInfo:nil repeats:YES];
 }
 
-- (void)spawnEnemy: (NSTimer *) timer {
-    UIImageView * enemy = [[UIImageView alloc] initWithFrame:CGRectMake(arc4random() % (int)(self.view.frame.size.width - 50), -100, 80, 80)];
+- (void)playLevel {
+    NSArray *lines =  @[@"OxxxxxxxxO",
+                       @"xOxxxxxxxx",
+                       @"xxOxxxxxxx",
+                       @"xxxOxxxxxx",
+                       @"xxxxxxxxxx",
+                       @"xxxxxxxxx",
+                       @"xxxOxxxxxx",
+                       @"xxOxxxxxxx",
+                       @"xOxxxxxxxx",
+                       @"xxxxOxxxxx"];
+    
+    for(NSString *line in lines) [NSTimer scheduledTimerWithTimeInterval:3.0 target:self selector:@selector(playLine:) userInfo:line repeats:NO];
+}
+
+- (void) playLine: (NSTimer*) timer {
+    for(int i = 0; i < [[timer userInfo] length]; i++) {
+        if([[timer userInfo] characterAtIndex:i] == 'O') [self spawnEnemyAtX:(i)*(self.view.frame.size.width/10) withSpeed:2];
+    }
+}
+
+- (void)spawnEnemyAtX: (int) x withSpeed: (int) speed {
+    UIImageView * enemy = [[UIImageView alloc] initWithFrame:CGRectMake(x, -100, 80, 80)];
     enemy.animationImages = [NSArray arrayWithObjects:
                              [UIImage imageNamed:@"enemy1"],
                              [UIImage imageNamed:@"enemy2"],
@@ -51,8 +78,8 @@
     [enemy startAnimating];
     
     [enemies addObject:enemy];
-    [UIView animateWithDuration:(arc4random() % 15) + 6
-                          delay:0.0
+    [UIView animateWithDuration: speed
+                          delay: 0.0
                         options: UIViewAnimationOptionCurveLinear
                      animations:^{
                          [enemy setFrame:CGRectMake(enemy.frame.origin.x, self.view.frame.size.height + 100, 100, 100)];
