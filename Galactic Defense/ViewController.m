@@ -22,6 +22,9 @@
     float duration;
     int laserAlternator;
     __weak IBOutlet UILabel *scoreLabel;
+    
+    int currentLine;
+    
 }
 
 @end
@@ -32,6 +35,8 @@
     scoreLabel.text = @"0";
     lasers = [NSMutableArray array];
     enemies = [NSMutableArray array];
+    currentLine = 0;
+    
     [super viewDidLoad];
     [self setupBackground];
     [self setupPlayer];
@@ -41,28 +46,28 @@
 }
 
 - (void)levelLoop {
-    [self playLevel];
+    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(playLine:) userInfo:nil repeats:YES];
     [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(checkCollisions:) userInfo:nil repeats:YES];
 }
 
-- (void)playLevel {
-    NSArray *lines =  @[@"OxxxxxxxxO",
-                       @"xOxxxxxxxx",
-                       @"xxOxxxxxxx",
-                       @"xxxOxxxxxx",
-                       @"xxxxxxxxxx",
-                       @"xxxxxxxxx",
-                       @"xxxOxxxxxx",
-                       @"xxOxxxxxxx",
-                       @"xOxxxxxxxx",
-                       @"xxxxOxxxxx"];
-    
-    for(NSString *line in lines) [NSTimer scheduledTimerWithTimeInterval:3.0 target:self selector:@selector(playLine:) userInfo:line repeats:NO];
-}
-
 - (void) playLine: (NSTimer*) timer {
-    for(int i = 0; i < [[timer userInfo] length]; i++) {
-        if([[timer userInfo] characterAtIndex:i] == 'O') [self spawnEnemyAtX:(i)*(self.view.frame.size.width/10) withSpeed:2];
+    
+    NSArray *lines =  @[@"OxxxxxxxxO",
+                        @"xOxxxxxxOx",
+                        @"xxOxxxxOxx",
+                        @"xxxOxxOxxx",
+                        @"xxxxOOxxxx",
+                        @"xxxxOOxxx",
+                        @"xxxOxxOxxx",
+                        @"xxOxxxxOxx",
+                        @"xOxxxxxxOx",
+                        @"OxxxxxxxxO"];
+    
+    if([lines count]  > currentLine) {
+        for(int i = 0; i < [lines[currentLine] length]; i++) {
+            if([lines[currentLine] characterAtIndex:i] == 'O') [self spawnEnemyAtX:(i) * self.view.frame.size.width/11 withSpeed:12];
+        }
+        currentLine++;
     }
 }
 
@@ -101,7 +106,7 @@
     [self.view addSubview:player];
     [player startAnimating];
     
-    [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(shootLaser:) userInfo:nil repeats:YES];
+    [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(shootLaser:) userInfo:nil repeats:YES];
     
 }
 
@@ -116,7 +121,7 @@
     }
     UIImageView * laser = [[UIImageView alloc] initWithFrame:CGRectMake(laserStart, player.center.y-32, 80, 80)];
     laser.image = [UIImage imageNamed:@"laser"];
-    [UIView animateWithDuration:player.frame.origin.y/400
+    [UIView animateWithDuration:player.frame.origin.y/500
                           delay:0.0
                         options: UIViewAnimationOptionCurveLinear
                      animations:^{
