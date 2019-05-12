@@ -61,7 +61,17 @@
                         @"xxxOxxOxxx",
                         @"xxOxxxxOxx",
                         @"xOxxxxxxOx",
-                        @"OxxxxxxxxO"];
+                        @"OxxxxxxxxO",
+                        @"xxxxxxxxxx",
+                        @"xxxxxxxxxx",
+                        @"xxxxxxxxxx",
+                        @"xxxxxxxxxx",
+                        @"xxxxxxxxxx",
+                        @"xxxxxxxxxx",
+                        @"xxxOxxOxxx",
+                        @"xxOxxxxOxx",
+                        @"xxxOxxOxxx",
+                        @"xxxxOOxxxx"];
     
     if([lines count]  > currentLine) {
         for(int i = 0; i < [lines[currentLine] length]; i++) {
@@ -72,11 +82,24 @@
 }
 
 - (void)spawnEnemyAtX: (int) x withSpeed: (int) speed {
-    UIImageView * enemy = [[UIImageView alloc] initWithFrame:CGRectMake(x, -100, 80, 80)];
-    enemy.animationImages = [NSArray arrayWithObjects:
-                             [UIImage imageNamed:@"enemy1"],
-                             [UIImage imageNamed:@"enemy2"],
-                             [UIImage imageNamed:@"enemy3"], nil];
+    UIImageView * enemy;
+    
+    int random = rand() % 2;
+    if (random == 1) {
+        enemy = [[UIImageView alloc] initWithFrame:CGRectMake(x, -100, 80, 80)];
+        enemy.animationImages = [NSArray arrayWithObjects:
+                                 [UIImage imageNamed:@"enemy1"],
+                                 [UIImage imageNamed:@"enemy2"],
+                                 [UIImage imageNamed:@"enemy3"], nil];
+    } else {
+        int randsize = (rand() % 40) + 20;
+        enemy = [[UIImageView alloc] initWithFrame:CGRectMake(x, -100, randsize, randsize)];
+        enemy.animationImages = [NSArray arrayWithObjects:
+                                 [UIImage imageNamed:@"meteor1"],
+                                 [UIImage imageNamed:@"meteor2"],
+                                 [UIImage imageNamed:@"meteor3"],
+                                 [UIImage imageNamed:@"meteor4"], nil];
+    }
     enemy.animationDuration = 0.3f;
     [enemy setAnimationRepeatCount:0];
     [self.view addSubview:enemy];
@@ -87,7 +110,7 @@
                           delay: 0.0
                         options: UIViewAnimationOptionCurveLinear
                      animations:^{
-                         [enemy setFrame:CGRectMake(enemy.frame.origin.x, self.view.frame.size.height + 100, 100, 100)];
+                         [enemy setFrame:CGRectMake(enemy.frame.origin.x, self.view.frame.size.height + 100, enemy.frame.size.width, enemy.frame.size.height)];
                      }
                      completion:^(BOOL finished){
                          enemy.image = nil;
